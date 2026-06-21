@@ -41,7 +41,10 @@
     </table>
     <button class="btn btn2" onclick="addRow()">+ Tambah Baris Claim</button>
     <div class="total">Jumlah Tuntutan: RM <span id="grandTotal">0.00</span></div>
-    <button class="btn" onclick="submitClaim()">Submit Claim</button>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button class="btn" onclick="submitClaim()" style="flex:1">Submit Claim</button>
+      <button class="btn" onclick="resetForm()" style="background:#b91c1c;flex:0 0 auto;">&#x21BA; Reset</button>
+    </div>
     <div id="status" class="status"></div>
   </div>
 </div>
@@ -203,6 +206,27 @@ async function submitClaim(){
     status.className = 'status error';
     status.innerText = 'Ralat hantar claim: ' + err.message;
   }
+}
+
+function resetForm(){
+  if (!confirm('Reset semua data? Tindakan ini tidak boleh dibatalkan.')) return;
+
+  // Clear applicant fields
+  ['staffId','nama','jabatan','jawatan','email'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('tarikhPermohonan').valueAsDate = new Date();
+  document.getElementById('staffLookupStatus').innerText = '';
+
+  // Reset claim table to 1 empty row
+  document.getElementById('claimBody').innerHTML = '';
+  addRow();
+
+  // Reset total and status
+  document.getElementById('grandTotal').innerText = '0.00';
+  const s = document.getElementById('status');
+  s.className = 'status';
+  s.innerText = '';
 }
 
 addRow();
