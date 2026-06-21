@@ -102,9 +102,50 @@
     .dlink{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:10px;}
     .dlink:hover{text-decoration:underline;}
     @media(max-width:860px){.stats{grid-template-columns:1fr 1fr;}.igrid{grid-template-columns:1fr 1fr;}.fgrid{grid-template-columns:1fr;}}
+
+    /* LOGIN */
+    .login-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy-dark),var(--navy));z-index:999;display:flex;align-items:center;justify-content:center;padding:16px;}
+    .login-screen.hidden{display:none;}
+    .login-card{background:#fff;border-radius:14px;padding:36px 40px;width:100%;max-width:400px;box-shadow:0 16px 48px rgba(0,0,0,.3);}
+    .login-logo{text-align:center;margin-bottom:20px;}
+    .login-logo h2{color:var(--navy);font-size:18px;font-weight:800;margin-top:8px;}
+    .login-logo p{color:var(--muted);font-size:12px;margin-top:3px;}
+    .login-badge{display:inline-block;background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-top:6px;}
+    .lfield{margin-bottom:14px;}
+    .lfield label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+    .lfield input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:14px;outline:none;transition:border-color .15s;}
+    .lfield input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+    .login-btn{width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;transition:filter .15s;}
+    .login-btn:hover{filter:brightness(1.1);}
+    .login-err{display:none;background:#fee2e2;color:#991b1b;border:1px solid #fecaca;padding:9px 12px;border-radius:6px;font-size:12.5px;font-weight:600;margin-top:10px;text-align:center;}
+    .login-err.show{display:block;}
+    .logout-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;}
+    .logout-btn:hover{background:rgba(255,255,255,.2);}
   </style>
 </head>
 <body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <i class="fa-solid fa-shield-halved" style="font-size:32px;color:#1b3560"></i>
+      <h2>SECURE LABX SDN. BHD.</h2>
+      <p>Sistem Pengurusan Tuntutan</p>
+      <span class="login-badge"><i class="fa-solid fa-user-tie"></i> Admin Portal</span>
+    </div>
+    <div class="lfield">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="Masukkan username" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div class="lfield">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Masukkan password" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <button class="login-btn" onclick="doLogin()"><i class="fa-solid fa-right-to-bracket"></i> &nbsp;Log Masuk</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
 
 <div class="header">
   <div>
@@ -114,6 +155,7 @@
   <div class="header-right">
     <span class="role-badge"><i class="fa-solid fa-user-tie"></i> Admin</span>
     <span class="form-badge">FIN-007-F01</span>
+    <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Log Keluar</button>
   </div>
 </div>
 
@@ -181,6 +223,41 @@
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbyoTtVdUZMeXbtLgf_WeiGejsieRRxPZzPXi2aCUdz3ynxv2Xs1dBuNKZ_5vj1mWH8R/exec';
 let claims = [], filter = 'all';
+
+// ── AUTH ──
+function checkAuth() {
+  const session = sessionStorage.getItem('slx_admin');
+  if (session === 'true') { document.getElementById('loginScreen').classList.add('hidden'); load(); }
+}
+
+async function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  const err = document.getElementById('loginErr');
+  err.classList.remove('show');
+  if (!u || !p) { err.textContent = 'Sila isi username dan password.'; err.classList.add('show'); return; }
+  const btn = document.querySelector('.login-btn');
+  btn.innerHTML = '<span class="spinner"></span> Mengesahkan...'; btn.disabled = true;
+  try {
+    const d = await (await fetch(`${API}?action=login&username=${encodeURIComponent(u)}&password=${encodeURIComponent(p)}&role=admin`)).json();
+    if (d.success) {
+      sessionStorage.setItem('slx_admin', 'true');
+      document.getElementById('loginScreen').classList.add('hidden');
+      load();
+    } else {
+      err.textContent = d.error || 'Login gagal.'; err.classList.add('show');
+    }
+  } catch { err.textContent = 'Gagal sambung ke server.'; err.classList.add('show'); }
+  btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> &nbsp;Log Masuk'; btn.disabled = false;
+}
+
+function logout() {
+  sessionStorage.removeItem('slx_admin');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  claims = [];
+}
 
 async function load() {
   document.getElementById('tbody').innerHTML = '<tr><td colspan="8" class="empty"><span class="spinner"></span> Memuatkan...</td></tr>';
@@ -347,7 +424,7 @@ function showMsg(el, t, html) {
 
 function closeOv() { document.getElementById('ov').classList.remove('open'); }
 
-load();
+checkAuth();
 </script>
 </body>
 </html>
