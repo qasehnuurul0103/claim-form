@@ -18,13 +18,16 @@
   <div class="section">
     <div class="grid">
       <div><label>Tarikh Permohonan</label><input type="date" id="tarikhPermohonan"></div>
-      <div><label>Staff ID</label><input type="text" id="staffId" placeholder="Contoh: SLX-001"></div>
+      <div>
+        <label>Staff ID</label>
+        <input type="text" id="staffId" placeholder="Contoh: SLX-001" onblur="lookupStaff()">
+        <span id="staffLookupStatus" class="small"></span>
+      </div>
       <div><label>Nama</label><input type="text" id="nama"></div>
       <div><label>Jabatan</label><input type="text" id="jabatan"></div>
       <div><label>Jawatan</label><input type="text" id="jawatan"></div>
       <div><label>Email Staff</label><input type="email" id="email"></div>
     </div>
-    <p class="small">Nota: Jika host di GitHub Pages, auto tarik Staff Database tidak digunakan dalam template asas ini. Staff isi maklumat sendiri.</p>
   </div>
 
   <div class="section">
@@ -57,6 +60,34 @@ const dokumenMap = {
 };
 
 document.getElementById('tarikhPermohonan').valueAsDate = new Date();
+
+async function lookupStaff() {
+  const staffId = document.getElementById('staffId').value.trim();
+  const statusEl = document.getElementById('staffLookupStatus');
+  if (!staffId) return;
+
+  statusEl.style.color = '#64748b';
+  statusEl.innerText = 'Mencari...';
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getStaff&staffId=${encodeURIComponent(staffId)}`);
+    const json = await res.json();
+    if (json.success) {
+      document.getElementById('nama').value    = json.nama    || '';
+      document.getElementById('jabatan').value = json.jabatan || '';
+      document.getElementById('jawatan').value = json.jawatan || '';
+      document.getElementById('email').value   = json.email   || '';
+      statusEl.style.color = '#15803d';
+      statusEl.innerText = 'Maklumat staff dijumpai.';
+    } else {
+      statusEl.style.color = '#b91c1c';
+      statusEl.innerText = json.error || 'Staff ID tidak dijumpai.';
+    }
+  } catch (err) {
+    statusEl.style.color = '#b91c1c';
+    statusEl.innerText = 'Gagal sambung ke server.';
+  }
+}
 
 function addRow(){
   const tbody = document.getElementById('claimBody');
