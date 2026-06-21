@@ -20,7 +20,7 @@
       <div><label>Tarikh Permohonan</label><input type="date" id="tarikhPermohonan"></div>
       <div>
         <label>Staff ID</label>
-        <input type="text" id="staffId" placeholder="Contoh: SLX-001" onblur="lookupStaff()">
+        <input type="text" id="staffId" placeholder="Contoh: SLX-001" onblur="lookupStaff()" onkeydown="if(event.key==='Enter'){event.preventDefault();lookupStaff();}">
         <span id="staffLookupStatus" class="small"></span>
       </div>
       <div><label>Nama</label><input type="text" id="nama"></div>
