@@ -1,290 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="ms">
 <head>
-  <base target="_top">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SLX Staff Claim System</title>
   <style>
-    :root {
-      --navy: #1f3a5f;
-      --navy-dark: #13263f;
-      --blue-soft: #dce9f9;
-      --paper: #ffffff;
-      --line: #d7dde7;
-      --bg: #f4f6f9;
-      --note: #fff7d6;
-      --success: #dcfce7;
-      --danger: #fee2e2;
-      --text: #172033;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding: 20px;
-    }
-
-    .page {
-      max-width: 1180px;
-      margin: auto;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
-    }
-
-    .company-header {
-      background: var(--navy);
-      color: white;
-      text-align: center;
-      padding: 18px 12px;
-      border-bottom: 4px solid var(--navy-dark);
-    }
-
-    .company-header h1 {
-      margin: 0;
-      font-size: 20px;
-      letter-spacing: .5px;
-    }
-
-    .company-header p {
-      margin: 6px 0 0;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    .section-title {
-      background: var(--blue-soft);
-      color: #0f172a;
-      font-weight: bold;
-      padding: 10px 14px;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .section { padding: 16px; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-
-    label {
-      display: block;
-      font-size: 12px;
-      color: #22314a;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      border: 1px solid #b9c2d0;
-      border-radius: 4px;
-      padding: 8px;
-      font-size: 13px;
-      background: white;
-    }
-
-    textarea { min-height: 70px; resize: vertical; }
-
-    input[readonly] { background: #f8fafc; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 8px;
-    }
-
-    th {
-      background: var(--navy);
-      color: white;
-      padding: 9px 6px;
-      font-size: 12px;
-      text-align: center;
-      border: 1px solid #17304e;
-    }
-
-    td {
-      border: 1px solid var(--line);
-      padding: 7px;
-      vertical-align: top;
-      background: white;
-    }
-
-    .bil { text-align: center; font-weight: bold; padding-top: 14px; }
-
-    .note {
-      background: var(--note);
-      border-left: 4px solid #f0c400;
-      padding: 8px;
-      font-size: 12px;
-      line-height: 1.35;
-      border-radius: 3px;
-    }
-
-    .mileage-box {
-      display: none;
-      background: #eef3fb;
-      border: 1px solid #cbd8ef;
-      padding: 10px;
-      border-radius: 5px;
-      margin-top: 8px;
-    }
-
-    .mileage-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-    }
-
-    .file-help {
-      font-size: 11px;
-      color: #475569;
-      margin-top: 4px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      align-items: center;
-      padding: 16px;
-      border-top: 1px solid var(--line);
-    }
-
-    .btn {
-      border: none;
-      border-radius: 4px;
-      padding: 10px 16px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    .btn-primary { background: var(--navy); color: white; }
-    .btn-secondary { background: #eef2f7; color: #0f172a; border: 1px solid #cbd5e1; }
-    .btn-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-
-    .summary-box {
-      text-align: right;
-      padding: 14px 16px;
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--navy-dark);
-      background: #f8fafc;
-      border-top: 1px solid var(--line);
-    }
-
-    .status {
-      display: none;
-      margin: 12px 16px;
-      padding: 12px;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-
-    .status.success { display: block; background: var(--success); color: #166534; }
-    .status.error { display: block; background: var(--danger); color: #991b1b; }
-
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: 1fr; }
-      .mileage-grid { grid-template-columns: 1fr; }
-      body { padding: 8px; }
-      table { font-size: 12px; }
-    }
+    body{font-family:Arial,sans-serif;background:#f4f6f9;margin:0;padding:20px;color:#1f2937}.container{max-width:1150px;margin:auto;background:#fff;border:1px solid #ddd;box-shadow:0 2px 10px rgba(0,0,0,.12)}.header{background:#23395d;color:white;text-align:center;padding:18px;font-weight:700}.sub{font-size:13px;margin-top:5px;font-weight:400}.section{padding:16px;border-bottom:1px solid #e5e7eb}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}label{display:block;font-weight:700;margin-bottom:4px;color:#102a4c}input,select,textarea{width:100%;padding:8px;border:1px solid #bbb;border-radius:4px;box-sizing:border-box}textarea{min-height:38px}table{width:100%;border-collapse:collapse;margin-top:12px}th{background:#23395d;color:white;padding:8px;font-size:13px}td{border:1px solid #ddd;padding:7px;vertical-align:top}.btn{background:#23395d;color:white;border:0;border-radius:4px;padding:10px 16px;font-weight:700;cursor:pointer}.btn2{background:#f8fafc;color:#102a4c;border:1px solid #cbd5e1;width:100%;margin-top:10px}.note{background:#fff7d6;border-left:4px solid #f0c400;padding:8px;font-size:12px}.mileage{display:none;background:#eef3fb;padding:8px;border-radius:5px;margin-top:8px}.total{text-align:right;font-size:20px;font-weight:700;padding:14px;color:#102a4c}.small{font-size:12px;color:#64748b}.status{margin-top:10px;font-weight:700}.success{color:#15803d}.error{color:#b91c1c}@media(max-width:800px){.grid{grid-template-columns:1fr}table{font-size:12px}}
   </style>
 </head>
 <body>
-  <div class="page">
-    <div class="company-header">
-      <h1>SECURE LABX SDN. BHD.</h1>
-      <p>BORANG TUNTUTAN BAYARAN BALIK WANG / STAFF CLAIM FORM</p>
-    </div>
-
-    <div class="section-title">MAKLUMAT PEMOHON</div>
-    <div class="section">
-      <div class="grid">
-        <div>
-          <label>Tarikh Permohonan</label>
-          <input type="date" id="tarikhPermohonan">
-        </div>
-        <div>
-          <label>Staff ID</label>
-          <input type="text" id="staffId" placeholder="Contoh: SLX-001" onblur="loadStaffInfo()">
-        </div>
-        <div>
-          <label>Nama Staff</label>
-          <input type="text" id="nama">
-        </div>
-        <div>
-          <label>Email</label>
-          <input type="email" id="email">
-        </div>
-        <div>
-          <label>Jabatan</label>
-          <input type="text" id="jabatan">
-        </div>
-        <div>
-          <label>Jawatan</label>
-          <input type="text" id="jawatan">
-        </div>
-        <div>
-          <label>Status</label>
-          <input type="text" value="Pending Admin Review" readonly>
-        </div>
-        <div>
-          <label>Catatan Ringkas</label>
-          <input type="text" id="catatan" placeholder="Jika ada">
-        </div>
-      </div>
-    </div>
-
-    <div class="section-title">MAKLUMAT TUNTUTAN</div>
-    <div class="section">
-      <table id="claimTable">
-        <thead>
-          <tr>
-            <th style="width: 45px;">Bil</th>
-            <th style="width: 135px;">Tarikh</th>
-            <th style="width: 210px;">Jenis Claim</th>
-            <th>Keterangan</th>
-            <th style="width: 230px;">Dokumen Wajib Upload</th>
-            <th style="width: 130px;">No Resit</th>
-            <th style="width: 170px;">Upload Dokumen</th>
-            <th style="width: 120px;">Jumlah RM</th>
-            <th style="width: 70px;">Padam</th>
-          </tr>
-        </thead>
-        <tbody id="claimBody"></tbody>
-      </table>
-
-      <button class="btn btn-secondary" type="button" onclick="addRow()">+ Tambah Baris Claim</button>
-    </div>
-
-    <div class="summary-box">JUMLAH TUNTUTAN: RM <span id="grandTotal">0.00</span></div>
-    <div id="statusBox" class="status"></div>
-
-    <div class="section-title">STATUS CLAIM</div>
-    <div class="section">
-      <div class="note">
-        Status awal selepas staff submit: <b>Pending Admin Review</b>.<br>
-        Bahagian kelulusan tidak dipaparkan kepada staff. Semakan Admin dan Keputusan OM akan dikemaskini melalui Admin/OM Dashboard.
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="btn btn-secondary" type="button" onclick="resetForm()">Reset</button>
-      <button class="btn btn-primary" type="button" onclick="submitForm()">Submit Claim</button>
-    </div>
+<div class="container">
+  <div class="header">
+    SECURE LABX SDN. BHD.
+    <div class="sub">BORANG TUNTUTAN BAYARAN BALIK WANG / STAFF CLAIM FORM</div>
   </div>
 
+  <div class="section">
+    <div class="grid">
+      <div><label>Tarikh Permohonan</label><input type="date" id="tarikhPermohonan"></div>
+      <div><label>Staff ID</label><input type="text" id="staffId" placeholder="Contoh: SLX-001"></div>
+      <div><label>Nama</label><input type="text" id="nama"></div>
+      <div><label>Jabatan</label><input type="text" id="jabatan"></div>
+      <div><label>Jawatan</label><input type="text" id="jawatan"></div>
+      <div><label>Email Staff</label><input type="email" id="email"></div>
+    </div>
+    <p class="small">Nota: Jika host di GitHub Pages, auto tarik Staff Database tidak digunakan dalam template asas ini. Staff isi maklumat sendiri.</p>
+  </div>
+
+  <div class="section">
+    <table id="claimTable">
+      <thead>
+        <tr>
+          <th>Bil</th><th>Tarikh</th><th>Jenis Claim</th><th>Keterangan</th><th>No Resit</th><th>Dokumen Perlu Upload</th><th>Upload Dokumen</th><th>Jumlah RM</th>
+        </tr>
+      </thead>
+      <tbody id="claimBody"></tbody>
+    </table>
+    <button class="btn btn2" onclick="addRow()">+ Tambah Baris Claim</button>
+    <div class="total">Jumlah Tuntutan: RM <span id="grandTotal">0.00</span></div>
+    <button class="btn" onclick="submitClaim()">Submit Claim</button>
+    <div id="status" class="status"></div>
+  </div>
+</div>
+
 <script>
+// PASTE URL WEB APP APPS SCRIPT DI SINI
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyoTtVdUZMeXbtLgf_WeiGejsieRRxPZzPXi2aCUdz3ynxv2Xs1dBuNKZ_5vj1mWH8R/exec';
+
 const dokumenMap = {
-  'Mileage': 'Bukti perjalanan / screenshot maps / arahan kerja / bukti lawatan site.',
+  'Mileage': 'Screenshot Google Maps / bukti perjalanan / arahan kerja / bukti lawatan site.',
   'Tol / Parking': 'Resit tol / resit parking.',
   'Pembelian Barang': 'Resit pembelian / invoice / quotation jika ada.',
   'Makan / Refreshment': 'Resit pembelian / senarai nama peserta jika berkaitan.',
@@ -292,195 +56,125 @@ const dokumenMap = {
   'Lain-lain': 'Dokumen sokongan berkaitan.'
 };
 
-window.onload = function() {
-  document.getElementById('tarikhPermohonan').valueAsDate = new Date();
-  addRow();
-};
+document.getElementById('tarikhPermohonan').valueAsDate = new Date();
 
-function addRow() {
+function addRow(){
   const tbody = document.getElementById('claimBody');
   const rowNo = tbody.rows.length + 1;
   const tr = document.createElement('tr');
   tr.innerHTML = `
-    <td class="bil">${rowNo}</td>
+    <td>${rowNo}</td>
     <td><input type="date" class="tarikh"></td>
     <td>
-      <select class="kategori" onchange="handleKategoriChange(this)">
+      <select class="kategori" onchange="kategoriChange(this)">
         <option value="">-- Pilih --</option>
-        <option>Mileage</option>
-        <option>Tol / Parking</option>
-        <option>Pembelian Barang</option>
-        <option>Makan / Refreshment</option>
-        <option>Training / Kursus</option>
-        <option>Lain-lain</option>
+        <option>Mileage</option><option>Tol / Parking</option><option>Pembelian Barang</option><option>Makan / Refreshment</option><option>Training / Kursus</option><option>Lain-lain</option>
       </select>
-      <div class="mileage-box">
-        <div class="mileage-grid">
-          <div><label>Dari</label><input type="text" class="dari" placeholder="Office JB"></div>
-          <div><label>Ke</label><input type="text" class="ke" placeholder="Site / Client"></div>
-          <div><label>Tujuan</label><input type="text" class="tujuan" placeholder="Lawatan site"></div>
-          <div><label>Jarak KM</label><input type="number" class="km" min="0" step="0.01" oninput="calculateMileage(this)"></div>
-          <div style="grid-column: 1 / -1;"><label>Kadar</label><input type="text" class="kadarKm" value="RM1.00/KM untuk lebih 20KM" readonly></div>
-        </div>
+      <div class="mileage">
+        <label>Dari</label><input type="text" class="dari" placeholder="Contoh: Office JB">
+        <label>Ke</label><input type="text" class="ke" placeholder="Contoh: Site Client">
+        <label>Tujuan Perjalanan</label><input type="text" class="tujuan" placeholder="Contoh: Lawatan site">
+        <label>Jarak KM</label><input type="number" class="km" oninput="calcMileage(this)" placeholder="Contoh: 25">
+        <label>Kadar</label><input type="text" value="RM1.00/KM untuk lebih 20KM" readonly>
       </div>
     </td>
-    <td><textarea class="keterangan" placeholder="Nyatakan tujuan claim"></textarea></td>
+    <td><textarea class="keterangan"></textarea></td>
+    <td><input type="text" class="noResit"></td>
     <td><div class="note dokumenText">Sila pilih jenis claim.</div></td>
-    <td><input type="text" class="noResit" placeholder="Jika ada"></td>
-    <td>
-      <input type="file" class="files" multiple>
-      <div class="file-help">Boleh upload PDF / image / dokumen.</div>
-    </td>
-    <td><input type="number" class="jumlah" min="0" step="0.01" value="0.00" oninput="calculateTotal()"></td>
-    <td><button type="button" class="btn btn-danger" onclick="deleteRow(this)">X</button></td>
-  `;
+    <td><input type="file" class="files" multiple></td>
+    <td><input type="number" class="jumlah" value="0.00" oninput="calcTotal()"></td>`;
   tbody.appendChild(tr);
 }
 
-function deleteRow(btn) {
-  btn.closest('tr').remove();
-  refreshBil();
-  calculateTotal();
-}
-
-function refreshBil() {
-  document.querySelectorAll('#claimBody tr').forEach((row, index) => {
-    row.querySelector('.bil').innerText = index + 1;
-  });
-}
-
-function handleKategoriChange(select) {
-  const row = select.closest('tr');
-  const kategori = select.value;
-  const mileageBox = row.querySelector('.mileage-box');
-  const dokumenText = row.querySelector('.dokumenText');
+function kategoriChange(sel){
+  const row = sel.closest('tr');
+  const kategori = sel.value;
+  row.querySelector('.dokumenText').innerText = dokumenMap[kategori] || 'Sila pilih jenis claim.';
+  const mileage = row.querySelector('.mileage');
   const jumlah = row.querySelector('.jumlah');
-
-  dokumenText.innerText = dokumenMap[kategori] || 'Sila pilih jenis claim.';
-
-  if (kategori === 'Mileage') {
-    mileageBox.style.display = 'block';
+  if(kategori === 'Mileage'){
+    mileage.style.display = 'block';
     jumlah.readOnly = true;
     jumlah.value = '0.00';
   } else {
-    mileageBox.style.display = 'none';
+    mileage.style.display = 'none';
     jumlah.readOnly = false;
     jumlah.value = '0.00';
   }
-  calculateTotal();
+  calcTotal();
 }
 
-function calculateMileage(input) {
+function calcMileage(input){
   const row = input.closest('tr');
   const km = Number(input.value || 0);
-  const jumlah = row.querySelector('.jumlah');
-  jumlah.value = km > 20 ? (km * 1).toFixed(2) : '0.00';
-  calculateTotal();
+  row.querySelector('.jumlah').value = km > 20 ? (km * 1).toFixed(2) : '0.00';
+  calcTotal();
 }
 
-function calculateTotal() {
+function calcTotal(){
   let total = 0;
-  document.querySelectorAll('.jumlah').forEach(input => total += Number(input.value || 0));
+  document.querySelectorAll('.jumlah').forEach(x => total += Number(x.value || 0));
   document.getElementById('grandTotal').innerText = total.toFixed(2);
 }
 
-function loadStaffInfo() {
-  const staffId = document.getElementById('staffId').value.trim();
-  if (!staffId) return;
-
-  google.script.run.withSuccessHandler(function(data) {
-    if (data) {
-      document.getElementById('nama').value = data.nama || '';
-      document.getElementById('jabatan').value = data.jabatan || '';
-      document.getElementById('jawatan').value = data.jawatan || '';
-      document.getElementById('email').value = data.email || '';
-    }
-  }).getStaffInfo(staffId);
-}
-
-function readFiles(input) {
-  const files = Array.from(input.files || []);
-  return Promise.all(files.map(file => new Promise((resolve, reject) => {
+function fileToBase64(file){
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = e => resolve({ name: file.name, type: file.type, data: e.target.result });
+    reader.onload = () => resolve({name:file.name, type:file.type, data:reader.result.split(',')[1]});
     reader.onerror = reject;
     reader.readAsDataURL(file);
-  })));
+  });
 }
 
-async function collectItems() {
-  const rows = Array.from(document.querySelectorAll('#claimBody tr'));
+async function submitClaim(){
+  const status = document.getElementById('status');
+  status.className = 'status';
+  status.innerText = 'Sedang hantar claim...';
+
   const items = [];
-
-  for (const row of rows) {
+  for (const row of document.querySelectorAll('#claimBody tr')){
+    const fileInput = row.querySelector('.files');
+    const files = [];
+    for (const file of fileInput.files){ files.push(await fileToBase64(file)); }
     const kategori = row.querySelector('.kategori').value;
-    const files = await readFiles(row.querySelector('.files'));
-
     items.push({
       tarikh: row.querySelector('.tarikh').value,
-      kategori: kategori,
+      kategori,
       keterangan: row.querySelector('.keterangan').value,
-      dokumenDiperlukan: row.querySelector('.dokumenText').innerText,
       noResit: row.querySelector('.noResit').value,
+      dokumenDiperlukan: row.querySelector('.dokumenText').innerText,
       jumlah: row.querySelector('.jumlah').value,
       dari: row.querySelector('.dari')?.value || '',
       ke: row.querySelector('.ke')?.value || '',
       tujuan: row.querySelector('.tujuan')?.value || '',
       km: row.querySelector('.km')?.value || '',
       kadarKm: kategori === 'Mileage' ? 'RM1.00/KM untuk lebih 20KM' : '',
-      files: files
+      files
     });
   }
-  return items;
-}
 
-async function submitForm() {
-  showStatus('', '');
-
-  const data = {
+  const payload = {
     tarikhPermohonan: document.getElementById('tarikhPermohonan').value,
     staffId: document.getElementById('staffId').value,
     nama: document.getElementById('nama').value,
     jabatan: document.getElementById('jabatan').value,
     jawatan: document.getElementById('jawatan').value,
     email: document.getElementById('email').value,
-    catatan: document.getElementById('catatan').value,
-    items: await collectItems()
+    totalClaim: document.getElementById('grandTotal').innerText,
+    items
   };
 
-  google.script.run
-    .withSuccessHandler(function(response) {
-      showStatus(`Claim berjaya dihantar. No Claim: ${response.noClaim}. Jumlah: RM ${Number(response.totalClaim).toFixed(2)}`, 'success');
-      setTimeout(() => resetForm(), 1200);
-    })
-    .withFailureHandler(function(error) {
-      showStatus(error.message || 'Ralat semasa submit claim.', 'error');
-    })
-    .submitClaim(data);
-}
-
-function showStatus(message, type) {
-  const box = document.getElementById('statusBox');
-  box.className = 'status';
-  box.innerText = '';
-  if (message) {
-    box.innerText = message;
-    box.classList.add(type);
+  try{
+    await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload)});
+    status.className = 'status success';
+    status.innerText = 'Claim berjaya dihantar. Sila semak Google Sheet.';
+  } catch(err){
+    status.className = 'status error';
+    status.innerText = 'Ralat hantar claim: ' + err.message;
   }
 }
 
-function resetForm() {
-  document.getElementById('staffId').value = '';
-  document.getElementById('nama').value = '';
-  document.getElementById('jabatan').value = '';
-  document.getElementById('jawatan').value = '';
-  document.getElementById('email').value = '';
-  document.getElementById('catatan').value = '';
-  document.getElementById('claimBody').innerHTML = '';
-  document.getElementById('tarikhPermohonan').valueAsDate = new Date();
-  addRow();
-  calculateTotal();
-}
+addRow();
 </script>
 </body>
 </html>
