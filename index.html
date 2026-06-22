@@ -465,6 +465,26 @@
     <div id="statusMsg"></div>
   </div>
 
+  <!-- STATUS CHECK / RESUBMIT -->
+  <div class="section-wrap" id="statusSection">
+    <div class="section-title">
+      <div class="icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+      <h2>Semak Status & Kemukakan Semula</h2>
+      <div class="line"></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+      <div class="field" style="flex:1;min-width:200px;">
+        <label>No Claim</label>
+        <input type="text" id="checkNo" placeholder="Cth: CLM-2601-0001"
+          onkeydown="if(event.key==='Enter')checkClaimStatus()" style="text-transform:uppercase" />
+      </div>
+      <button class="btn btn-submit" style="padding:9px 18px;white-space:nowrap;margin-bottom:5px" onclick="checkClaimStatus()">
+        <i class="fa-solid fa-magnifying-glass"></i> Semak Status
+      </button>
+    </div>
+    <div id="statusResult" style="margin-top:14px;display:none;"></div>
+  </div>
+
   <div class="footer">
     &copy; Secure Labx Sdn. Bhd. &nbsp;|&nbsp; Sistem Tuntutan Kakitangan &nbsp;|&nbsp; Semua maklumat adalah SULIT
   </div>
@@ -675,6 +695,114 @@ function resetForm() {
 }
 
 addRow();
+
+/* ── STATUS CHECK ── */
+let _resubmitClaim = null;
+
+async function checkClaimStatus() {
+  const no = document.getElementById('checkNo').value.trim().toUpperCase();
+  const resultDiv = document.getElementById('statusResult');
+  resultDiv.style.display = 'block';
+  if (!no) {
+    resultDiv.innerHTML = '<div style="color:#dc2626;font-weight:600"><i class="fa-solid fa-circle-xmark"></i> Sila masukkan No Claim.</div>';
+    return;
+  }
+  resultDiv.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:#1e40af"><span class="spinner"></span> Memeriksa status...</div>';
+  try {
+    const d = await (await fetch(`${SCRIPT_URL}?action=getClaimDetails&noClaim=${encodeURIComponent(no)}`)).json();
+    if (!d.success) throw new Error(d.error || 'Claim tidak dijumpai.');
+    _resubmitClaim = d.claim;
+    renderStatusResult(d.claim);
+  } catch(e) {
+    resultDiv.innerHTML = `<div style="background:#fee2e2;border:1px solid #fecaca;border-radius:8px;padding:14px;color:#991b1b;font-weight:600"><i class="fa-solid fa-circle-xmark"></i> ${e.message}</div>`;
+  }
+}
+
+function renderStatusResult(c) {
+  const resultDiv = document.getElementById('statusResult');
+  const canResubmit = c.statusAdmin === 'Dokumen Tidak Lengkap / Dikembalikan' || c.keputusanOM === 'Tolak';
+  let label, bg, border, color, icon;
+  if (c.keputusanOM === 'Lulus') {
+    label = 'LULUS'; bg = '#dcfce7'; border = '#bbf7d0'; color = '#166534'; icon = 'fa-circle-check';
+  } else if (c.keputusanOM === 'Tolak') {
+    label = 'DITOLAK oleh OM'; bg = '#fee2e2'; border = '#fecaca'; color = '#991b1b'; icon = 'fa-circle-xmark';
+  } else if (c.statusAdmin === 'Dokumen Tidak Lengkap / Dikembalikan') {
+    label = 'Dikembalikan – Dokumen Tidak Lengkap'; bg = '#fff7ed'; border = '#fed7aa'; color = '#9a3412'; icon = 'fa-rotate-left';
+  } else if (c.statusAdmin === 'Pending OM Approval') {
+    label = 'Dalam Semakan Operations Manager'; bg = '#dbeafe'; border = '#bfdbfe'; color = '#1e40af'; icon = 'fa-paper-plane';
+  } else {
+    label = 'Pending Semakan Admin'; bg = '#fef3c7'; border = '#fde68a'; color = '#92400e'; icon = 'fa-hourglass-half';
+  }
+  const notes = [];
+  if (c.catatanAdmin) notes.push(`<div><div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase">Catatan Admin</div><div style="margin-top:2px">${c.catatanAdmin}</div></div>`);
+  if (c.catatanOM)    notes.push(`<div><div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase">Catatan OM</div><div style="margin-top:2px">${c.catatanOM}</div></div>`);
+  resultDiv.innerHTML = `
+    <div style="background:${bg};border:1.5px solid ${border};border-radius:10px;padding:16px 18px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <i class="fa-solid ${icon}" style="font-size:24px;color:${color}"></i>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:${color}">${label}</div>
+          <div style="font-size:12px;color:#64748b;margin-top:3px">
+            <strong>${c.noClaim}</strong> &nbsp;·&nbsp; ${c.nama} &nbsp;·&nbsp; RM ${c.jumlah} &nbsp;·&nbsp; ${c.tarikhPermohonan}
+          </div>
+        </div>
+      </div>
+      ${notes.length ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;padding-top:10px;border-top:1px solid ${border}">${notes.join('')}</div>` : ''}
+      ${canResubmit ? `<button class="btn btn-submit" style="margin-top:14px" onclick="doResubmit()"><i class="fa-solid fa-rotate-right"></i> Kemukakan Semula Tuntutan</button>` : ''}
+    </div>`;
+}
+
+function doResubmit() {
+  const c = _resubmitClaim;
+  if (!c) return;
+  document.getElementById('staffId').value  = c.staffId  || '';
+  document.getElementById('nama').value     = c.nama     || '';
+  document.getElementById('jabatan').value  = c.jabatan  || '';
+  document.getElementById('jawatan').value  = c.jawatan  || '';
+  document.getElementById('email').value    = c.email    || '';
+  document.getElementById('tarikhPermohonan').valueAsDate = new Date();
+  document.getElementById('claimBody').innerHTML = '';
+  (c.items || []).forEach(function(item) {
+    addRow();
+    const rows = document.getElementById('claimBody').rows;
+    const tr = rows[rows.length - 1];
+    const t = tr.querySelector('.tarikh');
+    if (t && item.tarikh) {
+      const p = item.tarikh.split('/');
+      if (p.length === 3) t.value = p[2] + '-' + p[1] + '-' + p[0];
+    }
+    const k = tr.querySelector('.kategori');
+    if (k) { k.value = item.kategori || ''; kategoriChange(k); }
+    const ket = tr.querySelector('.keterangan');
+    if (ket) ket.value = item.keterangan || '';
+    const resit = tr.querySelector('.noResit');
+    if (resit) resit.value = item.noResit || '';
+    if (item.kategori === 'Mileage') {
+      const dari = tr.querySelector('.dari'); if (dari) dari.value = item.dari || '';
+      const ke   = tr.querySelector('.ke');   if (ke)   ke.value   = item.ke   || '';
+      const tuju = tr.querySelector('.tujuan'); if (tuju) tuju.value = item.tujuan || '';
+      const km   = tr.querySelector('.km');   if (km)   { km.value = item.km || ''; calcMileage(km); }
+    } else {
+      const j = tr.querySelector('.jumlah');
+      if (j) { j.value = parseFloat(item.jumlah || 0).toFixed(2); calcTotal(); }
+    }
+  });
+  calcTotal();
+  const s = document.getElementById('statusMsg');
+  s.className = 'show loading';
+  s.innerHTML = '<i class="fa-solid fa-circle-info"></i> &nbsp;Mengisi semula berdasarkan tuntutan <strong>' + c.noClaim + '</strong>. No claim baru akan dijana semasa submit. Sila semak semua maklumat dan muat naik semula dokumen jika perlu.';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ── URL PARAM: auto-trigger resubmit ── */
+(function() {
+  const r = new URLSearchParams(window.location.search).get('resubmit');
+  if (r) {
+    document.getElementById('checkNo').value = r.toUpperCase();
+    document.getElementById('statusSection').scrollIntoView({ behavior: 'smooth' });
+    checkClaimStatus();
+  }
+})();
 </script>
 </body>
 </html>
