@@ -284,8 +284,15 @@
 
     try {
       var url  = SCRIPT_URL + "?action=login&staffId=" + enc(staffId) + "&password=" + enc(password);
-      var resp = await fetch(url);
-      var data = await resp.json();
+      var resp = await fetch(url, { redirect: "follow" });
+      var text = await resp.text();
+      var data;
+      try { data = JSON.parse(text); } catch(pe) {
+        showMsg(msgEl, "Response error (not JSON). Check deployment settings.", "error");
+        console.error("Raw response:", text);
+        btn.disabled = false; btn.textContent = "Login";
+        return;
+      }
 
       if (data.status !== "success") {
         showMsg(msgEl, data.message || "Login failed.", "error");
@@ -300,8 +307,9 @@
       // Always show the full list first; highlight the linked application if ref is in URL
       loadPendingList(URL_REF);
 
-    } catch {
-      showMsg(msgEl, "Connection error. Please try again.", "error");
+    } catch(err) {
+      showMsg(msgEl, "Connection error: " + err.message, "error");
+      console.error("Login error:", err);
       btn.disabled = false; btn.textContent = "Login";
     }
   }
