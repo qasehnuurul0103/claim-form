@@ -342,8 +342,8 @@
       // If came from email link, sort highlighted app to the top
       if (highlightRef) {
         apps.sort(function(a, b) {
-          if ((a["Submitted At"] || "") === highlightRef) return -1;
-          if ((b["Submitted At"] || "") === highlightRef) return  1;
+          if ((a["Application ID"] || a["Submitted At"] || "") === highlightRef) return -1;
+          if ((b["Application ID"] || b["Submitted At"] || "") === highlightRef) return  1;
           return 0;
         });
         document.getElementById("listMsg").innerHTML =
@@ -354,7 +354,7 @@
         apps.length + ' pending application' + (apps.length !== 1 ? 's' : '') + ' awaiting your review</div>';
 
       apps.forEach(function(app) {
-        var ref       = app["Submitted At"] || "";
+        var ref       = app["Application ID"] || app["Submitted At"] || "";
         var isHighlight = highlightRef && ref === highlightRef;
         var leaveType = app["Leave Type"] || "";
         var days      = app["Total Leave Days"] || "";
