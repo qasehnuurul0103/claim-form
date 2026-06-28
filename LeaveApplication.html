@@ -373,6 +373,102 @@
       .form-body { padding: 24px 18px; }
       .header { padding: 24px 18px 18px; }
     }
+
+    /* Upload section */
+    .upload-area {
+      border: 2px dashed #d1d5db;
+      border-radius: 7px;
+      padding: 14px 16px;
+      background: #fafbff;
+      transition: border-color 0.2s;
+    }
+    .upload-area.error-border { border-color: #e53935 !important; }
+    .upload-area input[type="file"] {
+      width: 100%;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      padding: 4px 0;
+      outline: none;
+    }
+    .upload-hint { font-size: 0.78rem; color: #888; margin-top: 6px; }
+    #uploadStatus { margin-top: 6px; font-size: 0.82rem; font-weight: 600; min-height: 16px; }
+    #uploadStatus.success { color: #2e7d32; }
+    #uploadStatus.error   { color: #c62828; }
+
+    /* Modal */
+    #printModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 10000;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 30px 16px;
+      overflow-y: auto;
+    }
+    #printModal.visible { display: flex; }
+    .modal-card {
+      background: #fff;
+      border-radius: 10px;
+      max-width: 620px;
+      width: 100%;
+      padding: 36px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+    }
+    .modal-actions { display: flex; gap: 12px; margin-top: 28px; }
+    .btn-print {
+      flex: 1; padding: 11px;
+      background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+      color: #fff; border: none; border-radius: 7px;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-print:hover { opacity: 0.88; }
+    .btn-close-modal {
+      flex: 1; padding: 11px; background: #f0f4f8; color: #444;
+      border: 1.5px solid #d1d5db; border-radius: 7px;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-close-modal:hover { background: #e2e8f0; }
+
+    /* Print slip */
+    .slip-header { text-align: center; border-bottom: 2px solid #1a73e8; padding-bottom: 14px; margin-bottom: 18px; }
+    .slip-header h2 { font-size: 1.05rem; font-weight: 700; color: #0d47a1; text-transform: uppercase; letter-spacing: 0.5px; }
+    .slip-header p  { font-size: 0.82rem; color: #555; margin-top: 3px; }
+    .slip-section   { margin-bottom: 14px; }
+    .slip-section-title {
+      font-size: 0.71rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #1a73e8;
+      border-bottom: 1px solid #e8f0fe; padding-bottom: 4px; margin-bottom: 9px;
+    }
+    .slip-row { display: flex; font-size: 0.86rem; margin-bottom: 5px; line-height: 1.4; }
+    .slip-label { width: 145px; flex-shrink: 0; color: #555; font-weight: 600; }
+    .slip-value { color: #222; word-break: break-word; flex: 1; }
+    .slip-value a { color: #1a73e8; }
+    .slip-status {
+      text-align: center; font-size: 0.88rem; font-weight: 700;
+      color: #e65100; border: 1.5px solid #e65100;
+      border-radius: 6px; padding: 6px 12px; margin: 14px 0;
+    }
+    .slip-signatures {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px; margin-top: 18px;
+      border-top: 1px solid #e0e0e0; padding-top: 14px;
+    }
+    .sig-box { font-size: 0.76rem; color: #555; }
+    .sig-line { border-bottom: 1px solid #999; height: 28px; margin-bottom: 5px; }
+
+    @media print {
+      body > * { display: none !important; }
+      #printModal {
+        display: block !important; position: static !important;
+        background: none !important; padding: 0 !important; overflow: visible !important;
+      }
+      .modal-card { box-shadow: none !important; border-radius: 0 !important; padding: 16px !important; max-width: 100% !important; }
+      .modal-actions { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -522,6 +618,16 @@
         <textarea id="reason" name="reason" placeholder="Please briefly describe your reason for taking leave..." required></textarea>
       </div>
 
+      <!-- Supporting Document Upload -->
+      <div class="form-group full" id="uploadGroup" style="display:none;">
+        <label for="supportingDoc">Supporting Document <span class="required">*</span></label>
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="supportingDoc" accept=".pdf" />
+          <p class="upload-hint">Accepted format: PDF only &middot; Max file size: 10 MB</p>
+          <div id="uploadStatus"></div>
+        </div>
+      </div>
+
       <button type="submit" class="btn-submit" id="submitBtn">Submit</button>
     </form>
   </div>
@@ -529,6 +635,17 @@
 
 <!-- Toast -->
 <div id="toast"></div>
+
+<!-- Print Modal -->
+<div id="printModal">
+  <div class="modal-card">
+    <div id="printSlip"></div>
+    <div class="modal-actions">
+      <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+      <button class="btn-close-modal" id="closeModalBtn">Close</button>
+    </div>
+  </div>
+</div>
 
 <script>
   // -------------------------------------------------------
@@ -863,6 +980,18 @@
     } else if (val !== "Compassionate Leave" && !halfDayEl.checked) {
       resetToFreeDate();
     }
+
+    // Supporting document upload — hidden for Annual Leave only
+    const uploadGrp = document.getElementById("uploadGroup");
+    if (val && val !== "Annual Leave") {
+      uploadGrp.style.display = "";
+    } else {
+      uploadGrp.style.display = "none";
+      document.getElementById("supportingDoc").value = "";
+      document.getElementById("uploadStatus").textContent = "";
+      document.getElementById("uploadStatus").className = "";
+      document.getElementById("uploadArea").classList.remove("error-border");
+    }
   });
 
   // Half Day logic
@@ -994,6 +1123,93 @@
     setTimeout(() => { toast.style.display = "none"; }, 5000);
   }
 
+  // Upload helpers
+  const uploadStatus = document.getElementById("uploadStatus");
+  const uploadArea   = document.getElementById("uploadArea");
+
+  document.getElementById("supportingDoc").addEventListener("change", function () {
+    const file = this.files[0];
+    if (!file) { uploadStatus.textContent = ""; uploadStatus.className = ""; return; }
+    if (file.type !== "application/pdf") {
+      uploadStatus.textContent = "Invalid file type. Please upload a PDF.";
+      uploadStatus.className   = "error";
+      this.value = "";
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      uploadStatus.textContent = "File exceeds 10 MB. Please upload a smaller file.";
+      uploadStatus.className   = "error";
+      this.value = "";
+      return;
+    }
+    uploadStatus.textContent = "✓ " + file.name + " (" + (file.size / 1024 / 1024).toFixed(2) + " MB)";
+    uploadStatus.className   = "success";
+    uploadArea.classList.remove("error-border");
+  });
+
+  function readFileAsBase64(file) {
+    return new Promise(function (resolve, reject) {
+      const reader = new FileReader();
+      reader.onload  = function (ev) { resolve(ev.target.result.split(",")[1]); };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function closeModal() {
+    document.getElementById("printModal").classList.remove("visible");
+  }
+
+  function buildPrintSlip(payload, appId, appDocUrl, suppDocUrl) {
+    function row(label, value) {
+      if (!value) return "";
+      return '<div class="slip-row"><span class="slip-label">' + label + '</span><span class="slip-value">' + value + '</span></div>';
+    }
+    function rowLink(label, url, text) {
+      if (!url) return "";
+      return '<div class="slip-row"><span class="slip-label">' + label + '</span><span class="slip-value"><a href="' + url + '" target="_blank">' + text + '</a></span></div>';
+    }
+    const halfDayInfo = payload.halfDay === "Yes" ? "Yes – " + payload.session : "";
+    const dateStr = new Date().toLocaleDateString("en-MY", { day: "2-digit", month: "long", year: "numeric" });
+
+    return (
+      '<div class="slip-header">' +
+        '<h2>Leave Application Request</h2>' +
+        '<p>Ref No: <strong>' + appId + '</strong> &nbsp;|&nbsp; Submitted: ' + dateStr + '</p>' +
+      '</div>' +
+      '<div class="slip-section">' +
+        '<div class="slip-section-title">Employee Information</div>' +
+        row("Name",        payload.employeeName) +
+        row("Staff ID",    payload.employeeId) +
+        row("Department",  payload.department) +
+        row("Position",    payload.position) +
+        row("Email",       payload.email) +
+        row("Phone",       payload.phone) +
+      '</div>' +
+      '<div class="slip-section">' +
+        '<div class="slip-section-title">Leave Details</div>' +
+        row("Leave Type",   payload.leaveType) +
+        (payload.compassionateType ? row("Family Relation", payload.compassionateType) : "") +
+        (halfDayInfo              ? row("Half Day",         halfDayInfo)              : "") +
+        row("Start Date",   payload.startDate) +
+        row("End Date",     payload.endDate) +
+        row("Total Days",   payload.totalDays + " working day(s)") +
+        row("Reason",       payload.reason) +
+      '</div>' +
+      '<div class="slip-section">' +
+        '<div class="slip-section-title">Documents (Google Drive)</div>' +
+        rowLink("Application", appDocUrl,  "View Application PDF") +
+        (suppDocUrl ? rowLink("Supporting Doc", suppDocUrl, "View Supporting Document") : "") +
+      '</div>' +
+      '<div class="slip-status">Status: Pending Approval</div>' +
+      '<div class="slip-signatures">' +
+        '<div class="sig-box"><div class="sig-line"></div>Employee Signature &amp; Date</div>' +
+        '<div class="sig-box"><div class="sig-line"></div>Supervisor &amp; Date</div>' +
+        '<div class="sig-box"><div class="sig-line"></div>HR Approved by &amp; Date</div>' +
+      '</div>'
+    );
+  }
+
   // Form submit
   document.getElementById("leaveForm").addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -1055,54 +1271,87 @@
       return;
     }
 
+    // Validate supporting document (required for all leave types except Annual Leave)
+    const fileInput   = document.getElementById("supportingDoc");
+    const docRequired = leaveTypeEl.value && leaveTypeEl.value !== "Annual Leave";
+    if (docRequired && (!fileInput.files || !fileInput.files[0])) {
+      showToast("Please upload a supporting document.", "error");
+      uploadArea.classList.add("error-border");
+      return;
+    }
+
     // Check script URL is configured
     if (SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
       showToast("Google Apps Script URL not configured yet. See setup instructions.", "error");
       return;
     }
 
-    const btn = document.getElementById("submitBtn");
-    btn.disabled = true;
+    const btn  = document.getElementById("submitBtn");
+    const form = this;
+    btn.disabled  = true;
     btn.innerHTML = '<span class="spinner"></span> Submitting...';
 
     const payload = {
-      employeeName:    document.getElementById("employeeName").value.trim(),
-      employeeId:      document.getElementById("employeeId").value.trim(),
-      department:      document.getElementById("department").value,
-      position:        document.getElementById("position").value.trim(),
-      email:         document.getElementById("email").value.trim(),
-      phone:         document.getElementById("phone").value.trim(),
+      employeeName:      document.getElementById("employeeName").value.trim(),
+      employeeId:        document.getElementById("employeeId").value.trim(),
+      department:        document.getElementById("department").value,
+      position:          document.getElementById("position").value.trim(),
+      email:             document.getElementById("email").value.trim(),
+      phone:             document.getElementById("phone").value.trim(),
       leaveType:         leaveTypeEl.value === "Other"
                            ? otherLeaveInput.value.trim()
                            : leaveTypeEl.value,
       compassionateType: compassionateVal ? compassionateVal.value : "",
       halfDay:           isHalfDay ? "Yes" : "No",
       session:           isHalfDay && sessionVal ? sessionVal.value : "",
-      startDate:     startDateEl.value,
-      endDate:       endDateEl.value,
-      totalDays:     totalDaysEl.value,
-      reason:        document.getElementById("reason").value.trim(),
+      startDate:         startDateEl.value,
+      endDate:           endDateEl.value,
+      totalDays:         totalDaysEl.value,
+      reason:            document.getElementById("reason").value.trim(),
     };
 
-    try {
-      const resp = await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode:   "no-cors",   // Apps Script deployed publicly — no-cors is expected
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    // Encode supporting document as base64 if provided
+    if (fileInput.files && fileInput.files[0]) {
+      btn.innerHTML  = '<span class="spinner"></span> Uploading...';
+      payload.fileBase64 = await readFileAsBase64(fileInput.files[0]);
+    }
 
-      // no-cors gives an opaque response; assume success if no exception thrown
+    try {
+      const resp   = await fetch(SCRIPT_URL, {
+        method:  "POST",
+        headers: { "Content-Type": "text/plain" },
+        body:    JSON.stringify(payload),
+      });
+      const result = await resp.json();
+
+      if (result.status !== "success") {
+        showToast("Submission failed: " + (result.message || "Unknown error."), "error");
+        return;
+      }
+
       showToast("Leave application submitted successfully!", "success");
-      this.reset();
-      totalDaysEl.value  = "";
-      daysDisplay.textContent = "";
+
+      // Populate and show modal
+      document.getElementById("printSlip").innerHTML =
+        buildPrintSlip(payload, result.appId || "—", result.appDocUrl || "", result.suppDocUrl || "");
+      document.getElementById("printModal").classList.add("visible");
+
+      document.getElementById("closeModalBtn").onclick = function () {
+        closeModal();
+        form.reset();
+        totalDaysEl.value       = "";
+        daysDisplay.textContent = "";
+        document.getElementById("uploadGroup").style.display = "none";
+        uploadStatus.textContent = "";
+        uploadStatus.className   = "";
+        uploadArea.classList.remove("error-border");
+      };
 
     } catch (err) {
       showToast("Submission failed. Please check your internet connection.", "error");
     } finally {
-      btn.disabled = false;
-      btn.innerHTML = "Submit Leave Application";
+      btn.disabled  = false;
+      btn.innerHTML = "Submit";
     }
   });
 </script>
