@@ -1190,7 +1190,12 @@
       '</div>' +
       '<div class="slip-status">Status: Pending Approval</div>' +
       '<div class="slip-signatures">' +
-        '<div class="sig-box"><div class="sig-filled">' + payload.employeeName + '<br>' + dateStr + '</div>Employee</div>' +
+        '<div class="sig-box">' +
+          '<div style="font-size:0.78rem;margin-bottom:3px;color:#555;">Applicant Name:</div>' +
+          '<div class="sig-filled">' + payload.employeeName + '</div>' +
+          '<div style="font-size:0.78rem;margin-bottom:3px;margin-top:8px;color:#555;">Date Applied:</div>' +
+          '<div class="sig-filled">' + dateStr + '</div>' +
+        '</div>' +
         '<div class="sig-box">' +
           '<div style="font-size:0.78rem;margin-bottom:3px;color:#555;">Approved by:</div>' +
           '<div class="sig-filled">' + (payload.managerName || '') + '</div>' +
