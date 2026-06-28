@@ -446,12 +446,13 @@
       border-radius: 6px; padding: 6px 12px; margin: 14px 0;
     }
     .slip-signatures {
-      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      display: grid; grid-template-columns: 1fr 1fr;
       gap: 14px; margin-top: 18px;
       border-top: 1px solid #e0e0e0; padding-top: 14px;
     }
     .sig-box { font-size: 0.76rem; color: #555; }
     .sig-line { border-bottom: 1px solid #999; height: 28px; margin-bottom: 5px; }
+    .sig-filled { border-bottom: 1px solid #999; padding-bottom: 4px; margin-bottom: 5px; font-size: 0.82rem; font-weight: 600; color: #222; min-height: 28px; }
 
   </style>
 </head>
@@ -702,6 +703,7 @@
         internDurationDisplay.value = `${months} month${months !== 1 ? "s" : ""}`;
       }
 
+      currentManagerName = data.managerName || "";
       setAutoFilled(true);
       staffLookupStatus.textContent = "Information loaded successfully.";
       staffLookupStatus.className   = "success";
@@ -728,6 +730,7 @@
     setAutoFilled(false);
     staffLookupStatus.textContent = "";
     staffLookupStatus.className   = "";
+    currentManagerName = "";
   });
 
   // Leave types available to Interns only
@@ -738,6 +741,7 @@
 
   // Set by fetchBalance when position is Intern; drives entitlement cap
   let internEntitlement = null;
+  let currentManagerName = "";
 
   function isInternPosition() {
     return positionEl.value.trim().toLowerCase() === "intern";
@@ -1186,9 +1190,13 @@
       '</div>' +
       '<div class="slip-status">Status: Pending Approval</div>' +
       '<div class="slip-signatures">' +
-        '<div class="sig-box"><div class="sig-line"></div>Employee Signature &amp; Date</div>' +
-        '<div class="sig-box"><div class="sig-line"></div>Supervisor &amp; Date</div>' +
-        '<div class="sig-box"><div class="sig-line"></div>HR Approved by &amp; Date</div>' +
+        '<div class="sig-box"><div class="sig-filled">' + payload.employeeName + '<br>' + dateStr + '</div>Employee</div>' +
+        '<div class="sig-box">' +
+          '<div style="font-size:0.78rem;margin-bottom:3px;color:#555;">Approved by:</div>' +
+          '<div class="sig-filled">' + (payload.managerName || '') + '</div>' +
+          '<div style="font-size:0.78rem;margin-bottom:3px;margin-top:8px;color:#555;">Date Approved:</div>' +
+          '<div class="sig-line"></div>' +
+        '</div>' +
       '</div>'
     );
   }
@@ -1291,6 +1299,7 @@
       endDate:           endDateEl.value,
       totalDays:         totalDaysEl.value,
       reason:            document.getElementById("reason").value.trim(),
+      managerName:       currentManagerName,
     };
 
     // Encode supporting document as base64 if provided
