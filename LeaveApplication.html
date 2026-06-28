@@ -419,14 +419,7 @@
       box-shadow: 0 8px 40px rgba(0,0,0,0.22);
     }
     .modal-actions { display: flex; gap: 12px; margin-top: 28px; }
-    .btn-print {
-      flex: 1; padding: 11px;
-      background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
-      color: #fff; border: none; border-radius: 7px;
-      font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
-    }
-    .btn-print:hover { opacity: 0.88; }
-    .btn-close-modal {
+.btn-close-modal {
       flex: 1; padding: 11px; background: #f0f4f8; color: #444;
       border: 1.5px solid #d1d5db; border-radius: 7px;
       font-size: 0.95rem; font-weight: 600; cursor: pointer;
@@ -460,15 +453,6 @@
     .sig-box { font-size: 0.76rem; color: #555; }
     .sig-line { border-bottom: 1px solid #999; height: 28px; margin-bottom: 5px; }
 
-    @media print {
-      body > * { display: none !important; }
-      #printModal {
-        display: block !important; position: static !important;
-        background: none !important; padding: 0 !important; overflow: visible !important;
-      }
-      .modal-card { box-shadow: none !important; border-radius: 0 !important; padding: 16px !important; max-width: 100% !important; }
-      .modal-actions { display: none !important; }
-    }
   </style>
 </head>
 <body>
@@ -641,8 +625,7 @@
   <div class="modal-card">
     <div id="printSlip"></div>
     <div class="modal-actions">
-      <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
-      <button class="btn-close-modal" id="closeModalBtn">Close</button>
+      <button class="btn-close-modal" id="closeModalBtn" style="flex:1;">Close</button>
     </div>
   </div>
 </div>
